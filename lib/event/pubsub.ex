@@ -13,9 +13,9 @@ defmodule Event.Pubsub do
   end
 
   @spec trigger(Event.Type.t()) :: :ok
-  def trigger(%Event.Type{} = event) do
-    event = %{event | date: DateTime.utc_now()}
-    Registry.dispatch(__MODULE__, event.name, fn subscribers ->
+  def trigger(event) do
+    event = Event.Type.set_date(event, DateTime.utc_now())
+    Registry.dispatch(__MODULE__, Event.Type.get_name(event), fn subscribers ->
       for {pid, _} <- subscribers do
         GenServer.call(pid, {:event, event})
       end
