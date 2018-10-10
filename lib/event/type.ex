@@ -8,15 +8,14 @@
 # end
 
 defprotocol Event.Type do
-  def new(name)
-  def get_date(event)
-  def set_date(event, date)
+  def get_time(event)
+  def set_time(event, time)
   def get_name(event)
 end
 
 defimpl Event.Type, for: Map do
-  def get_date(map), do: map.date
-  def set_date(map, date), do: %{map | date: date}
+  # time when the event was sent
+  def get_time(map), do: map.time
+  def set_time(map, time), do: %{map | time: time}
   def get_name(map), do: map.name
-  def new(name), do: %{name: name}
 end

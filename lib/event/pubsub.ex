@@ -1,4 +1,6 @@
 defmodule Event.Pubsub do
+  alias Event.Type
+
   def child_spec(_opts) do
     Registry.child_spec(
       keys: :duplicate,
@@ -12,10 +14,12 @@ defmodule Event.Pubsub do
     {:ok, _} = Registry.register(__MODULE__, event, [])
   end
 
-  @spec trigger(Event.Type.t()) :: :ok
+  @spec trigger(Type.t()) :: :ok
   def trigger(event) do
-    event = Event.Type.set_date(event, DateTime.utc_now())
-    Registry.dispatch(__MODULE__, Event.Type.get_name(event), fn subscribers ->
+    true = event |> Type.get_name() |> is_binary
+    event = Type.set_time(event, DateTime.utc_now())
+
+    Registry.dispatch(__MODULE__, Type.get_name(event), fn subscribers ->
       for {pid, _} <- subscribers do
         GenServer.call(pid, {:event, event})
       end
